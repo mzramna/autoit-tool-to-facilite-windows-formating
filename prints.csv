@@ -1,0 +1,7 @@
+tipo de log,comando,nome do print/output,nome da janela,diretorio relativo,reorganizar itens para exibir o maximo possivel/flag de exportação,extensão de arquivo,dimensão x da janela,dimensão y da janela,tempo padrão
+PRINT,c:\windows\system32\control.exe appwiz.cpl,programas instalados,Programas e Recursos,0,1,,,,
+PRINT,c:\windows\system32\control.exe printers,impressoras instaladas,Dispositivos e Impressoras,0,,,,,2
+PRINT,c:\windows\system32\control.exe /name microsoft.system,nomes dos dispositivos,Sistema,0,,,,,
+COMANDO,ipconfig,ipconfig,,0,>,.txt,,,
+COMANDO,certutil -p 'certa' -exportPFX * * ,cert,,0,,.pfx,,,
+COMANDO,net share,netshare,,0,>,.txt,,,
