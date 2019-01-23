@@ -76,7 +76,7 @@ func choose_action_from_array($diretorio_para_salvar,$array,$tempo_padrao=100,$t
    EndIf
    ;pega o array e subdivide em 2 arrays a partitr do 1 item de cada linha
    $arraylength=Ubound($array)-1  ;
-   dim $prints[$arraylength][10]
+   dim $prints[$arraylength][9]
    $printtmp=0
    dim $comandos[$arraylength][5]
    $commandtmp=0
@@ -96,9 +96,9 @@ func choose_action_from_array($diretorio_para_salvar,$array,$tempo_padrao=100,$t
 		 ;_ArrayDisplay($comandos, "comandos")
 		 $commandtmp+=1
 	  ElseIf $array[$i][0]="PRINT" then
-		 For $j = 1 to $array2dimlength-4
+		 For $j = 1 to $array2dimlength-1
 			$tmparray[$j] = $array[$i][$j]
-		 Next
+         Next
 		 For $g=0 to 8 step +1
 			$prints[$printtmp][$g]=$tmparray[$g+1]
 		 Next
@@ -123,13 +123,16 @@ func take_print_from_array($array,$diretorio_para_salvar,$tempo_padrao=100)
 		 $tmparray[$j] = $array[$i][$j]
 	  Next
 	  ;_ArrayDisplay($tmparray, "tmparray")
-	  print_generalizado($diretorio_para_salvar,$tmparray[0],$tmparray[1],$tmparray[2],$tmparray[3],$tmparray[4],$tmparray[5],$tmparray[6],$tmparray[7],$tmparray[8],$tmparray[9]*$tempo_padrao)
+	  if $tmparray[8]="" Then
+		 $tmparray[8]=1
+	  EndIf
+	  print_generalizado($diretorio_para_salvar,$tmparray[0],$tmparray[1],  $tmparray[2],   $tmparray[3],       $tmparray[4],      $tmparray[5],   $tmparray[6],$tmparray[7],$tmparray[8]*$tempo_padrao)
+	  ;                  $diretorio_para_salvar,$comando    ,$nome_do_print,$nome_da_janela,$diretorio_relativo,$reorganizar_itens,$file_extension,     $dimensao_X, $dimensao_Y,$sleep_padrao
    Next
 
 EndFunc
 
-func print_generalizado($diretorio_para_salvar,$comando, $nome_do_print,$nome_da_janela,$diretorio_relativo=0,$reorganizar_itens=False,$file_extension=".jpg",$resize=0,$dimensao_X=@DesktopWidth,$dimensao_Y=@DesktopHeight,$sleep_padrao=1)
-   MouseMove(0,0,9999)
+func print_generalizado($diretorio_para_salvar,$comando, $nome_do_print,$nome_da_janela,$diretorio_relativo=0,$reorganizar_itens=False,$file_extension=".jpg",$dimensao_X=@DesktopWidth,$dimensao_Y=@DesktopHeight,$sleep_padrao=1)
    if $diretorio_relativo="" Then
 	  $diretorio_relativo=0
    EndIf
@@ -138,15 +141,6 @@ func print_generalizado($diretorio_para_salvar,$comando, $nome_do_print,$nome_da
    EndIf
    if $file_extension = "" Then
 	  $file_extension=".jpg"
-   EndIf
-   if $dimensao_X="" And $dimensao_Y="" then
-   Else
-	  if $dimensao_X="" Then
-		 $dimensao_X=@DesktopWidth
-	  EndIf
-	  if $dimensao_Y="" Then
-		 $dimensao_Y=@DesktopHeight
-	  EndIf
    EndIf
    If $sleep_padrao="" Then
 	  $sleep_padrao=100
@@ -169,13 +163,20 @@ func print_generalizado($diretorio_para_salvar,$comando, $nome_do_print,$nome_da
 		 Sleep($sleep_padrao/4)
 	  Next
    EndIf
+   MouseMove(0,0,999)
    if $dimensao_X="" And $dimensao_Y="" then
 	  WinSetState($nome_da_janela,"",@SW_MAXIMIZE)
    Else
+	  if $dimensao_X="" Then
+		 $dimensao_X=@DesktopWidth
+	  EndIf
+	  if $dimensao_Y="" Then
+		 $dimensao_Y=@DesktopHeight
+	  EndIf
 	  WinMove($nome_da_janela,"",0,0,$dimensao_X,$dimensao_Y)
    EndIf
    sleep($sleep_padrao)
-   $print=_ScreenCapture_CaptureWnd("",$nome_da_janela,False)
+   $print=_ScreenCapture_CaptureWnd("",$nome_da_janela)
    _ScreenCapture_SaveImage($diretorio_para_salvar &"/"& $nome_do_print&$file_extension,$print)
    WinClose($nome_da_janela)
 EndFunc
@@ -206,35 +207,14 @@ func comando_generalizado($diretorio_para_salvar,$comando,$nome_do_output,$diret
 EndFunc
 
 func TakePrint_from_desktop($diretorio_para_salvar,$tempo_padrao=100,$filename="Desktop.jpg")
+   MouseMove(0,0,999)
    WinMinimizeAll ( )
    Sleep($tempo_padrao)
    $desktop=_ScreenCapture_Capture($diretorio_para_salvar &"/"&$filename,0,0,@DesktopWidth,@DesktopHeight)
    ;_ScreenCapture_SaveImage($diretorio_para_salvar &"/"&$filename,$desktop)
-
 EndFunc
 
 #endregion --- Au3Recorder generated code End ---
-
-Func list($path = "", $counter = 0)
-   $listing = 0
-	$counter = 0
-	$path &= '\'
-	Local $list_files = '', $file, $demand_file = FileFindFirstFile($path & '*')
-	If $demand_file = -1 Then Return ''
-	While 1
-		$file = FileFindNextFile($demand_file)
-		If @error Then ExitLoop
-		If @extended Then
-			If $counter >= 10 Then ContinueLoop
-			$listing &= $path & $file & "|"
-			list($path & $file, $counter + 1)
-		Else
-            $listing &= $path & $file & "|"
-		EndIf
-	WEnd
-	Return $listing
-	FileClose($demand_file)
-EndFunc
 
 $tempo_padrao=InputBox("tempo","insira o tempo base para esse computador em milisegundos","100")
 $diretorio_para_prints=FileSelectFolder("onde salvar", "insira onde por os dados apos obter todos")
@@ -258,6 +238,5 @@ $diretorio_para_prints=FileSelectFolder("onde salvar", "insira onde por os dados
 ;o padrão base do csv é possuir o seguinte cabeçalho no diretorio:
 
 choose_action_from_array($diretorio_para_prints,CSV_TO_ARRAY())
-
-MouseMove(@DesktopWidth/2,@DesktopHeight/2,9999)
+MouseMove(@DesktopWidth / 2,@DesktopHeight / 2,9999)
 MsgBox($MB_OK,"prints terminados","os prints foram salvos na pasta "&$diretorio_para_prints&" verifique se todos os prints foram tirados corretamente,caso contrário execute o comando novamente com um tempo padão maior")
